@@ -1,0 +1,38 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+
+async function render() {
+  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
+  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
+  const { default: worker } = await import(workerUrl.href);
+
+  return worker.fetch(
+    new Request("http://localhost/", {
+      headers: { accept: "text/html" },
+    }),
+    {
+      ASSETS: {
+        fetch: async () => new Response("Not found", { status: 404 }),
+      },
+    },
+    {
+      waitUntil() {},
+      passThroughOnException() {},
+    },
+  );
+}
+
+test("server-renders the DCFMS dashboard prototype", async () => {
+  const response = await render();
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
+
+  const html = await response.text();
+  assert.match(html, /<title>DCFMS Prototype \| NAPVCW<\/title>/i);
+  assert.match(html, /Digital Case Flow/);
+  assert.match(html, /Case flow overview/);
+  assert.match(html, /Prototype · demonstration data/);
+  assert.match(html, /DCFMS-2026-0027/);
+  assert.match(html, /No real victim, witness or case information is displayed/);
+  assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
+});
