@@ -29,6 +29,9 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Use project lockfile npm version
+        run: npm install --global npm@11.6.2
+
       - name: Install dependencies
         run: npm ci
 
