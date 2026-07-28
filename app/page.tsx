@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import {
   cases,
   divisionSummary,
@@ -15,6 +15,72 @@ type ViewKey =
   | "legal"
   | "protection"
   | "assistance";
+
+type AccessScope = "division" | "registry" | "all";
+
+type DemoEmployee = {
+  epfNumber: string;
+  password: string;
+  name: string;
+  initials: string;
+  designation: string;
+  division: string;
+  homeView: ViewKey;
+  scope: AccessScope;
+};
+
+const demoEmployees: DemoEmployee[] = [
+  {
+    epfNumber: "100245",
+    password: "Legal@123",
+    name: "N. Perera",
+    initials: "NP",
+    designation: "Legal Officer",
+    division: "Legal Division",
+    homeView: "legal",
+    scope: "division",
+  },
+  {
+    epfNumber: "100318",
+    password: "Protect@123",
+    name: "S. Fernando",
+    initials: "SF",
+    designation: "Protection Officer",
+    division: "Protection Division",
+    homeView: "protection",
+    scope: "division",
+  },
+  {
+    epfNumber: "100412",
+    password: "Assist@123",
+    name: "R. Silva",
+    initials: "RS",
+    designation: "Assistance Officer",
+    division: "Assistance Division",
+    homeView: "assistance",
+    scope: "division",
+  },
+  {
+    epfNumber: "800001",
+    password: "Board@123",
+    name: "Board Secretary",
+    initials: "BS",
+    designation: "Board Secretary",
+    division: "Board Secretariat",
+    homeView: "registry",
+    scope: "registry",
+  },
+  {
+    epfNumber: "900001",
+    password: "DG@123",
+    name: "Director General",
+    initials: "DG",
+    designation: "Director General",
+    division: "Executive Management",
+    homeView: "executive",
+    scope: "all",
+  },
+];
 
 const views: Array<{
   key: ViewKey;
@@ -218,6 +284,195 @@ const viewDivision: Partial<Record<ViewKey, string>> = {
   assistance: "Assistance",
 };
 
+function LoginPage({
+  onLogin,
+}: {
+  onLogin: (employee: DemoEmployee) => void;
+}) {
+  const [epfNumber, setEpfNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+
+  function submitLogin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const employee = demoEmployees.find(
+      (record) =>
+        record.epfNumber === epfNumber.trim() && record.password === password,
+    );
+
+    if (!employee) {
+      setError("The EPF number or password is incorrect. Use a demonstration account below.");
+      return;
+    }
+
+    setError("");
+    onLogin(employee);
+  }
+
+  function useDemoAccount(employee: DemoEmployee) {
+    setEpfNumber(employee.epfNumber);
+    setPassword(employee.password);
+    setError("");
+  }
+
+  return (
+    <main className="login-page">
+      <section className="login-introduction">
+        <div className="login-brand">
+          <div className="login-emblem" aria-hidden="true">
+            NW
+          </div>
+          <div>
+            <p>National Authority</p>
+            <strong>NAPVCW</strong>
+          </div>
+        </div>
+
+        <div className="login-message">
+          <p className="login-kicker">Digital Case Flow Management System</p>
+          <h1>Secure access to coordinated case services.</h1>
+          <p>
+            One protected workspace for complaint registration, legal action,
+            protection services, assistance and executive oversight.
+          </p>
+
+          <div className="login-capabilities">
+            <div>
+              <span>01</span>
+              <p>
+                <strong>Division-based access</strong>
+                Employees are routed directly to their assigned operational division.
+              </p>
+            </div>
+            <div>
+              <span>02</span>
+              <p>
+                <strong>Management oversight</strong>
+                Authorized senior officers can review cross-division statistics.
+              </p>
+            </div>
+            <div>
+              <span>03</span>
+              <p>
+                <strong>Accountability by design</strong>
+                Future production actions will be attributable to an authenticated user.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <p className="login-classification">
+          Prototype environment · demonstration information only
+        </p>
+      </section>
+
+      <section className="login-form-section">
+        <div className="login-form-wrap">
+          <div className="login-form-heading">
+            <span className="secure-badge">Authorized personnel</span>
+            <h2>Sign in to DCFMS</h2>
+            <p>Use your EPF number and assigned password.</p>
+          </div>
+
+          <form className="login-form" onSubmit={submitLogin}>
+            <label>
+              <span>Username / EPF number</span>
+              <div className="login-input">
+                <i aria-hidden="true">ID</i>
+                <input
+                  autoComplete="username"
+                  inputMode="numeric"
+                  name="username"
+                  onChange={(event) => setEpfNumber(event.target.value)}
+                  placeholder="Enter EPF number"
+                  value={epfNumber}
+                />
+              </div>
+            </label>
+
+            <label>
+              <span>Password</span>
+              <div className="login-input">
+                <i aria-hidden="true">••</i>
+                <input
+                  autoComplete="current-password"
+                  name="password"
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Enter password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                />
+                <button
+                  className="password-toggle"
+                  onClick={() => setShowPassword((current) => !current)}
+                  type="button"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+            </label>
+
+            <div className="login-options">
+              <label className="remember-option">
+                <input type="checkbox" />
+                <span>Remember EPF number</span>
+              </label>
+              <button className="forgot-button" type="button">
+                Forgot password?
+              </button>
+            </div>
+
+            {error && (
+              <p className="login-error" role="alert">
+                {error}
+              </p>
+            )}
+
+            <button className="login-submit" type="submit">
+              Sign in securely
+              <span aria-hidden="true">→</span>
+            </button>
+          </form>
+
+          <div className="demo-accounts">
+            <div className="demo-heading">
+              <div>
+                <strong>Demonstration accounts</strong>
+                <span>Select an account to fill the login form.</span>
+              </div>
+              <span>Prototype</span>
+            </div>
+            <div className="demo-account-grid">
+              {demoEmployees.map((employee) => (
+                <button
+                  key={employee.epfNumber}
+                  onClick={() => useDemoAccount(employee)}
+                  type="button"
+                >
+                  <span>{employee.initials}</span>
+                  <div>
+                    <strong>{employee.designation}</strong>
+                    <small>
+                      EPF {employee.epfNumber} · {employee.password}
+                    </small>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <p className="login-notice">
+            This screen demonstrates the proposed access flow. Production
+            authentication, password hashing and authorization will be enforced
+            securely on the server.
+          </p>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 function StatusPill({ status }: { status: CaseRecord["status"] }) {
   return (
     <span className={`status status-${status.toLowerCase().replaceAll(" ", "-")}`}>
@@ -227,9 +482,22 @@ function StatusPill({ status }: { status: CaseRecord["status"] }) {
 }
 
 export default function Home() {
+  const [sessionUser, setSessionUser] = useState<DemoEmployee | null>(null);
   const [activeView, setActiveView] = useState<ViewKey>("executive");
   const [query, setQuery] = useState("");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  const availableViews = useMemo(() => {
+    if (!sessionUser) {
+      return [];
+    }
+
+    if (sessionUser.scope === "all") {
+      return views;
+    }
+
+    return views.filter((view) => view.key === sessionUser.homeView);
+  }, [sessionUser]);
 
   const activeDefinition = views.find((view) => view.key === activeView)!;
 
@@ -243,9 +511,30 @@ export default function Home() {
     });
   }, [activeView, query]);
 
+  function login(employee: DemoEmployee) {
+    setSessionUser(employee);
+    setActiveView(employee.homeView);
+    setQuery("");
+  }
+
+  function logout() {
+    setSessionUser(null);
+    setActiveView("executive");
+    setQuery("");
+    setMobileNavOpen(false);
+  }
+
   function changeView(view: ViewKey) {
+    if (!availableViews.some((availableView) => availableView.key === view)) {
+      return;
+    }
+
     setActiveView(view);
     setMobileNavOpen(false);
+  }
+
+  if (!sessionUser) {
+    return <LoginPage onLogin={login} />;
   }
 
   return (
@@ -267,8 +556,10 @@ export default function Home() {
         </div>
 
         <nav className="primary-nav" aria-label="Primary navigation">
-          <p className="nav-label">Workspaces</p>
-          {views.map((view) => (
+          <p className="nav-label">
+            {sessionUser.scope === "all" ? "Authorized workspaces" : "Assigned workspace"}
+          </p>
+          {availableViews.map((view) => (
             <button
               className={`nav-item ${activeView === view.key ? "nav-item-active" : ""}`}
               key={view.key}
@@ -280,23 +571,30 @@ export default function Home() {
             </button>
           ))}
 
-          <p className="nav-label nav-label-spaced">System</p>
-          <button className="nav-item" type="button">
-            <span className="nav-icon">RP</span>
-            <span>Reports</span>
-          </button>
-          <button className="nav-item" type="button">
-            <span className="nav-icon">AD</span>
-            <span>Administration</span>
-          </button>
+          {sessionUser.scope === "all" && (
+            <>
+              <p className="nav-label nav-label-spaced">Management</p>
+              <button className="nav-item" type="button">
+                <span className="nav-icon">RP</span>
+                <span>Cross-division reports</span>
+              </button>
+              <button className="nav-item" type="button">
+                <span className="nav-icon">AD</span>
+                <span>Access administration</span>
+              </button>
+            </>
+          )}
         </nav>
 
         <div className="sidebar-footer">
-          <div className="avatar">VS</div>
-          <div>
-            <strong>V. S. Rathnayake</strong>
-            <span>Prototype administrator</span>
+          <div className="avatar">{sessionUser.initials}</div>
+          <div className="sidebar-user">
+            <strong>{sessionUser.name}</strong>
+            <span>{sessionUser.designation}</span>
           </div>
+          <button className="logout-button" onClick={logout} type="button">
+            Sign out
+          </button>
         </div>
       </aside>
 
@@ -333,9 +631,13 @@ export default function Home() {
           </label>
 
           <div className="topbar-actions">
+            <div className="access-badge">
+              <span>{sessionUser.scope === "all" ? "Senior authority" : "Restricted access"}</span>
+              <strong>{sessionUser.division}</strong>
+            </div>
             <div className="data-date">
               <span>Demonstration snapshot</span>
-              <strong>27 July 2026</strong>
+              <strong>28 July 2026</strong>
             </div>
             <button className="notification-button" type="button" aria-label="Notifications">
               <span aria-hidden="true">!</span>

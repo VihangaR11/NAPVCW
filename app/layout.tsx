@@ -11,7 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const protocol =
     requestHeaders.get("x-forwarded-proto") ??
     (host.startsWith("localhost") ? "http" : "https");
-  const imageUrl = new URL("/og.png", `${protocol}://${host}`).toString();
+  const imageUrl = new URL("/og-login.png", `${protocol}://${host}`).toString();
 
   return {
     title: "DCFMS Prototype | NAPVCW",
@@ -23,13 +23,13 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     openGraph: {
       title: "DCFMS Prototype",
-      description: "Digital Case Flow Management System · Day 1 visual foundation",
+      description: "Digital Case Flow Management System · secure EPF sign-in and role-based access prototype",
       images: [{ url: imageUrl, width: 1680, height: 945 }],
     },
     twitter: {
       card: "summary_large_image",
       title: "DCFMS Prototype",
-      description: "Digital Case Flow Management System · Day 1 visual foundation",
+      description: "Digital Case Flow Management System · secure EPF sign-in and role-based access prototype",
       images: [imageUrl],
     },
   };
