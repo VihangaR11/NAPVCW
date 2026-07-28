@@ -22,17 +22,18 @@ async function render() {
   );
 }
 
-test("server-renders the DCFMS dashboard prototype", async () => {
+test("server-renders the DCFMS EPF login prototype", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
   assert.match(html, /<title>DCFMS Prototype \| NAPVCW<\/title>/i);
-  assert.match(html, /Digital Case Flow/);
-  assert.match(html, /Case flow overview/);
-  assert.match(html, /Prototype · demonstration data/);
-  assert.match(html, /DCFMS-2026-0027/);
-  assert.match(html, /No real victim, witness or case information is displayed/);
+  assert.match(html, /Digital Case Flow Management System/);
+  assert.match(html, /Sign in to DCFMS/);
+  assert.match(html, /Username \/ EPF number/);
+  assert.match(html, /Demonstration accounts/);
+  assert.match(html, /Production authentication, password hashing and authorization/);
+  assert.doesNotMatch(html, /DCFMS-2026-0027/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
