@@ -482,12 +482,21 @@ function LoginPage({
 }: {
   onLogin: (employee: DemoEmployee) => void;
 }) {
-  const [activePanel, setActivePanel] = useState<"signin" | "help" | "about">(
-    "signin",
-  );
+  const [activePanel, setActivePanel] = useState<
+    "signin" | "signup" | "help" | "about"
+  >("signin");
   const [epfNumber, setEpfNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [registeredAccounts, setRegisteredAccounts] = useState<DemoEmployee[]>(
+    [],
+  );
+  const [signupEpf, setSignupEpf] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [signupError, setSignupError] = useState("");
+  const [accountMessage, setAccountMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showSignupPasswords, setShowSignupPasswords] = useState(false);
   const [rememberEpf, setRememberEpf] = useState(false);
   const [error, setError] = useState("");
   const [resetEpf, setResetEpf] = useState("");
@@ -499,7 +508,7 @@ function LoginPage({
   function submitLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSubmitting(true);
-    const employee = demoEmployees.find(
+    const employee = [...demoEmployees, ...registeredAccounts].find(
       (record) =>
         record.epfNumber === epfNumber.trim() && record.password === password,
     );
@@ -512,6 +521,71 @@ function LoginPage({
 
     setError("");
     setTimeout(() => onLogin(employee), 550);
+  }
+
+  function openSignUp() {
+    setActivePanel("signup");
+    setSignupError("");
+    setAccountMessage("");
+  }
+
+  function createAccount(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const normalizedEpf = signupEpf.trim();
+    const meetsPasswordRules =
+      signupPassword.length >= 5 &&
+      /[a-z]/.test(signupPassword) &&
+      /[A-Z]/.test(signupPassword) &&
+      /\d/.test(signupPassword);
+
+    if (!/^\d+$/.test(normalizedEpf)) {
+      setSignupError("Enter a valid EPF number using numbers only.");
+      return;
+    }
+
+    if (
+      [...demoEmployees, ...registeredAccounts].some(
+        (account) => account.epfNumber === normalizedEpf,
+      )
+    ) {
+      setSignupError("An account already exists for this EPF number. Please sign in.");
+      return;
+    }
+
+    if (!meetsPasswordRules) {
+      setSignupError(
+        "Password must contain at least 5 characters, including uppercase, lowercase and a number.",
+      );
+      return;
+    }
+
+    if (signupPassword !== confirmPassword) {
+      setSignupError("The two passwords do not match. Please re-enter them.");
+      return;
+    }
+
+    const newAccount: DemoEmployee = {
+      epfNumber: normalizedEpf,
+      password: signupPassword,
+      name: `Employee ${normalizedEpf}`,
+      initials: "EP",
+      designation: "Registered Employee",
+      division: "Registry Division (prototype)",
+      homeView: "registry",
+      scope: "registry",
+    };
+
+    setRegisteredAccounts((current) => [...current, newAccount]);
+    setEpfNumber(normalizedEpf);
+    setPassword("");
+    setSignupEpf("");
+    setSignupPassword("");
+    setConfirmPassword("");
+    setSignupError("");
+    setAccountMessage(
+      "Account created successfully. Enter your new password to sign in.",
+    );
+    setActivePanel("signin");
   }
 
   function useDemoAccount(employee: DemoEmployee) {
@@ -568,6 +642,14 @@ function LoginPage({
           >
             <i aria-hidden="true">SI</i>
             <span>Sign in</span>
+          </button>
+          <button
+            className={activePanel === "signup" ? "login-nav-active" : ""}
+            onClick={openSignUp}
+            type="button"
+          >
+            <i aria-hidden="true">SU</i>
+            <span>Sign up</span>
           </button>
           <button
             className={activePanel === "help" ? "login-nav-active" : ""}
@@ -711,6 +793,12 @@ function LoginPage({
                   </p>
                 )}
 
+                {accountMessage && (
+                  <p className="account-success" role="status">
+                    {accountMessage}
+                  </p>
+                )}
+
                 <button
                   className="login-submit"
                   disabled={isSubmitting}
@@ -720,6 +808,13 @@ function LoginPage({
                   <span aria-hidden="true">→</span>
                 </button>
               </form>
+
+              <div className="account-switch">
+                <span>Do not have an account?</span>
+                <button onClick={openSignUp} type="button">
+                  Create account
+                </button>
+              </div>
 
               <details className="demo-accounts">
                 <summary>
@@ -751,6 +846,132 @@ function LoginPage({
               <p className="login-notice">
                 Prototype authentication only. Production credentials and role
                 authorization will be validated securely on the server.
+              </p>
+            </section>
+          )}
+
+          {activePanel === "signup" && (
+            <section className="login-card signup-card" aria-labelledby="signup-title">
+              <div className="login-card-seals" aria-hidden="true">
+                <span>
+                  <img
+                    src={publicAsset("sri-lanka-government-emblem.png")}
+                    alt=""
+                  />
+                </span>
+                <i />
+                <span>
+                  <img src={publicAsset("napvcw-emblem.png")} alt="" />
+                </span>
+              </div>
+
+              <div className="login-form-heading">
+                <span className="secure-badge">Employee registration</span>
+                <h2 id="signup-title">Create your account</h2>
+                <p>
+                  Register with your EPF number. Your division and permissions
+                  will be verified against the employee directory in production.
+                </p>
+              </div>
+
+              <form className="login-form" onSubmit={createAccount}>
+                <label>
+                  <span>EPF number</span>
+                  <div className="login-input">
+                    <i aria-hidden="true">ID</i>
+                    <input
+                      autoComplete="username"
+                      inputMode="numeric"
+                      name="signup-epf"
+                      onChange={(event) => setSignupEpf(event.target.value)}
+                      pattern="[0-9]+"
+                      placeholder="Enter EPF number"
+                      required
+                      value={signupEpf}
+                    />
+                  </div>
+                </label>
+
+                <label>
+                  <span>Create password</span>
+                  <div className="login-input">
+                    <i aria-hidden="true">PW</i>
+                    <input
+                      autoComplete="new-password"
+                      minLength={5}
+                      name="signup-password"
+                      onChange={(event) => setSignupPassword(event.target.value)}
+                      placeholder="Create a strong password"
+                      required
+                      type={showSignupPasswords ? "text" : "password"}
+                      value={signupPassword}
+                    />
+                    <button
+                      className="password-toggle"
+                      onClick={() =>
+                        setShowSignupPasswords((current) => !current)
+                      }
+                      type="button"
+                    >
+                      {showSignupPasswords ? "Hide" : "Show"}
+                    </button>
+                  </div>
+                </label>
+
+                <div className="password-rules" aria-label="Password requirements">
+                  <span className={signupPassword.length >= 5 ? "rule-met" : ""}>
+                    5+ characters
+                  </span>
+                  <span className={/[a-z]/.test(signupPassword) ? "rule-met" : ""}>
+                    Lowercase
+                  </span>
+                  <span className={/[A-Z]/.test(signupPassword) ? "rule-met" : ""}>
+                    Uppercase
+                  </span>
+                  <span className={/\d/.test(signupPassword) ? "rule-met" : ""}>
+                    Number
+                  </span>
+                </div>
+
+                <label>
+                  <span>Re-enter password</span>
+                  <div className="login-input">
+                    <i aria-hidden="true">PW</i>
+                    <input
+                      autoComplete="new-password"
+                      minLength={5}
+                      name="confirm-password"
+                      onChange={(event) => setConfirmPassword(event.target.value)}
+                      placeholder="Re-enter your password"
+                      required
+                      type={showSignupPasswords ? "text" : "password"}
+                      value={confirmPassword}
+                    />
+                  </div>
+                </label>
+
+                {signupError && (
+                  <p className="login-error" role="alert">
+                    {signupError}
+                  </p>
+                )}
+
+                <button className="login-submit" type="submit">
+                  Create account
+                  <span aria-hidden="true">→</span>
+                </button>
+              </form>
+
+              <div className="account-switch">
+                <span>Already have an account?</span>
+                <button onClick={() => setActivePanel("signin")} type="button">
+                  Return to sign in
+                </button>
+              </div>
+
+              <p className="login-notice">
+                Prototype registration only. This account remains available
+                until the page is refreshed.
               </p>
             </section>
           )}

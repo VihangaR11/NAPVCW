@@ -31,6 +31,8 @@ test("server-renders the DCFMS EPF login prototype", async () => {
   assert.match(html, /<title>DCFMS Prototype \| NAPVCW<\/title>/i);
   assert.match(html, /Digital Case Flow Management System/);
   assert.match(html, /Employee sign in/);
+  assert.match(html, /Do not have an account\?/);
+  assert.match(html, /Create account/);
   assert.match(html, /Username \/ EPF number/);
   assert.match(html, /Demonstration accounts/);
   assert.match(html, /sri-lanka-government-emblem\.png/);
