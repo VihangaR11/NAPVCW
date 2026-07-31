@@ -284,7 +284,7 @@ const viewDivision: Partial<Record<ViewKey, string>> = {
   assistance: "Assistance",
 };
 
-function LoginPage({
+function LegacyLoginPage({
   onLogin,
 }: {
   onLogin: (employee: DemoEmployee) => void;
@@ -468,6 +468,373 @@ function LoginPage({
             securely on the server.
           </p>
         </div>
+      </section>
+    </main>
+  );
+}
+
+function LoginPage({
+  onLogin,
+}: {
+  onLogin: (employee: DemoEmployee) => void;
+}) {
+  const [activePanel, setActivePanel] = useState<"signin" | "help" | "about">(
+    "signin",
+  );
+  const [epfNumber, setEpfNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberEpf, setRememberEpf] = useState(false);
+  const [error, setError] = useState("");
+  const [resetEpf, setResetEpf] = useState("");
+  const [resetMessage, setResetMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDark, setIsDark] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  function submitLogin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsSubmitting(true);
+    const employee = demoEmployees.find(
+      (record) =>
+        record.epfNumber === epfNumber.trim() && record.password === password,
+    );
+
+    if (!employee) {
+      setError("The EPF number or password is incorrect. Use a demonstration account below.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    setError("");
+    setTimeout(() => onLogin(employee), 550);
+  }
+
+  function useDemoAccount(employee: DemoEmployee) {
+    setActivePanel("signin");
+    setEpfNumber(employee.epfNumber);
+    setPassword(employee.password);
+    setError("");
+  }
+
+  function requestPasswordReset(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const employee = demoEmployees.find(
+      (record) => record.epfNumber === resetEpf.trim(),
+    );
+
+    setResetMessage(
+      employee
+        ? `A demonstration reset request has been recorded for EPF ${employee.epfNumber}.`
+        : "This EPF number is not in the demonstration employee directory.",
+    );
+  }
+
+  return (
+    <main
+      className={`login-page login-${isDark ? "dark" : "light"} ${
+        sidebarCollapsed ? "login-sidebar-collapsed" : ""
+      }`}
+    >
+      <aside className="login-sidebar">
+        <div className="login-sidebar-brand">
+          <img
+            src="/sri-lanka-government-emblem.png"
+            alt="Sri Lanka Government emblem"
+          />
+          <div className="login-sidebar-title">
+            <strong>DCFMS</strong>
+            <span>Government service</span>
+          </div>
+          <button
+            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="login-collapse"
+            onClick={() => setSidebarCollapsed((current) => !current)}
+            type="button"
+          >
+            {sidebarCollapsed ? "»" : "«"}
+          </button>
+        </div>
+
+        <nav className="login-navigation" aria-label="Login navigation">
+          <button
+            className={activePanel === "signin" ? "login-nav-active" : ""}
+            onClick={() => setActivePanel("signin")}
+            type="button"
+          >
+            <i aria-hidden="true">SI</i>
+            <span>Sign in</span>
+          </button>
+          <button
+            className={activePanel === "help" ? "login-nav-active" : ""}
+            onClick={() => setActivePanel("help")}
+            type="button"
+          >
+            <i aria-hidden="true">AH</i>
+            <span>Access help</span>
+          </button>
+          <button
+            className={activePanel === "about" ? "login-nav-active" : ""}
+            onClick={() => setActivePanel("about")}
+            type="button"
+          >
+            <i aria-hidden="true">IN</i>
+            <span>System overview</span>
+          </button>
+        </nav>
+
+        <div className="login-sidebar-authority">
+          <img src="/napvcw-emblem.png" alt="NAPVCW emblem" />
+          <div>
+            <strong>NAPVCW</strong>
+            <span>Authorized employee access</span>
+          </div>
+        </div>
+      </aside>
+
+      <section className="login-stage">
+        <header className="login-topbar">
+          <div className="login-topbar-identity">
+            <img src="/napvcw-emblem.png" alt="" aria-hidden="true" />
+            <div>
+              <p>
+                National Authority for the Protection of Victims of Crime and Witnesses
+              </p>
+              <h1>Digital Case Flow Management System</h1>
+            </div>
+          </div>
+          <button
+            aria-label={isDark ? "Use light theme" : "Use dark theme"}
+            className="login-theme-toggle"
+            onClick={() => setIsDark((current) => !current)}
+            type="button"
+          >
+            <span aria-hidden="true">{isDark ? "☀" : "☾"}</span>
+            <small>{isDark ? "Light" : "Dark"}</small>
+          </button>
+        </header>
+
+        <div className="login-stage-content">
+          {activePanel === "signin" && (
+            <section className="login-card" aria-labelledby="login-title">
+              <div className="login-card-seals" aria-hidden="true">
+                <span>
+                  <img src="/sri-lanka-government-emblem.png" alt="" />
+                </span>
+                <i />
+                <span>
+                  <img src="/napvcw-emblem.png" alt="" />
+                </span>
+              </div>
+
+              <div className="login-form-heading">
+                <span className="secure-badge">Authorized personnel only</span>
+                <h2 id="login-title">Employee sign in</h2>
+                <p>Enter your EPF number and assigned password to continue.</p>
+              </div>
+
+              <form className="login-form" onSubmit={submitLogin}>
+                <label>
+                  <span>Username / EPF number</span>
+                  <div className="login-input">
+                    <i aria-hidden="true">ID</i>
+                    <input
+                      autoComplete="username"
+                      inputMode="numeric"
+                      name="username"
+                      onChange={(event) => setEpfNumber(event.target.value)}
+                      placeholder="Enter EPF number"
+                      required
+                      value={epfNumber}
+                    />
+                  </div>
+                </label>
+
+                <label>
+                  <span>Password</span>
+                  <div className="login-input">
+                    <i aria-hidden="true">PW</i>
+                    <input
+                      autoComplete="current-password"
+                      name="password"
+                      onChange={(event) => setPassword(event.target.value)}
+                      placeholder="Enter password"
+                      required
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                    />
+                    <button
+                      className="password-toggle"
+                      onClick={() => setShowPassword((current) => !current)}
+                      type="button"
+                    >
+                      {showPassword ? "Hide" : "Show"}
+                    </button>
+                  </div>
+                </label>
+
+                <div className="login-options">
+                  <label className="remember-option">
+                    <input
+                      checked={rememberEpf}
+                      onChange={(event) => setRememberEpf(event.target.checked)}
+                      type="checkbox"
+                    />
+                    <span>Remember EPF number</span>
+                  </label>
+                  <button
+                    className="forgot-button"
+                    onClick={() => setActivePanel("help")}
+                    type="button"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+
+                {error && (
+                  <p className="login-error" role="alert">
+                    {error}
+                  </p>
+                )}
+
+                <button
+                  className="login-submit"
+                  disabled={isSubmitting}
+                  type="submit"
+                >
+                  {isSubmitting ? "Verifying access…" : "Sign in securely"}
+                  <span aria-hidden="true">→</span>
+                </button>
+              </form>
+
+              <details className="demo-accounts">
+                <summary>
+                  <div>
+                    <strong>Demonstration accounts</strong>
+                    <span>Select a fictional role for the presentation.</span>
+                  </div>
+                  <i>Prototype</i>
+                </summary>
+                <div className="demo-account-grid">
+                  {demoEmployees.map((employee) => (
+                    <button
+                      key={employee.epfNumber}
+                      onClick={() => useDemoAccount(employee)}
+                      type="button"
+                    >
+                      <span>{employee.initials}</span>
+                      <div>
+                        <strong>{employee.designation}</strong>
+                        <small>
+                          EPF {employee.epfNumber} · {employee.password}
+                        </small>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </details>
+
+              <p className="login-notice">
+                Prototype authentication only. Production credentials and role
+                authorization will be validated securely on the server.
+              </p>
+            </section>
+          )}
+
+          {activePanel === "help" && (
+            <section className="login-card login-support-card" aria-labelledby="help-title">
+              <span className="support-icon" aria-hidden="true">AH</span>
+              <div className="login-form-heading">
+                <span className="secure-badge">Account assistance</span>
+                <h2 id="help-title">Restore employee access</h2>
+                <p>
+                  Enter the EPF number linked to your account. A system
+                  administrator must approve every production reset.
+                </p>
+              </div>
+              <form className="login-form" onSubmit={requestPasswordReset}>
+                <label>
+                  <span>Employee EPF number</span>
+                  <div className="login-input">
+                    <i aria-hidden="true">ID</i>
+                    <input
+                      inputMode="numeric"
+                      onChange={(event) => setResetEpf(event.target.value)}
+                      placeholder="Enter EPF number"
+                      required
+                      value={resetEpf}
+                    />
+                  </div>
+                </label>
+                {resetMessage && (
+                  <p className="reset-message" role="status">
+                    {resetMessage}
+                  </p>
+                )}
+                <button className="login-submit" type="submit">
+                  Request reset assistance
+                  <span aria-hidden="true">→</span>
+                </button>
+              </form>
+              <button
+                className="back-to-login"
+                onClick={() => setActivePanel("signin")}
+                type="button"
+              >
+                ← Return to employee sign in
+              </button>
+            </section>
+          )}
+
+          {activePanel === "about" && (
+            <section className="login-card login-overview-card" aria-labelledby="about-title">
+              <div className="login-form-heading">
+                <span className="secure-badge">System overview</span>
+                <h2 id="about-title">Access follows responsibility.</h2>
+                <p>
+                  DCFMS routes each authenticated employee to the information
+                  required for their official duties.
+                </p>
+              </div>
+              <div className="access-model-list">
+                <article>
+                  <span>01</span>
+                  <div>
+                    <strong>Division employees</strong>
+                    <p>View and manage cases assigned to their own division only.</p>
+                  </div>
+                </article>
+                <article>
+                  <span>02</span>
+                  <div>
+                    <strong>Board Secretariat</strong>
+                    <p>Register complaints and coordinate authorized case routing.</p>
+                  </div>
+                </article>
+                <article>
+                  <span>03</span>
+                  <div>
+                    <strong>Senior authorities</strong>
+                    <p>Review major statistics and authorized cross-division oversight.</p>
+                  </div>
+                </article>
+              </div>
+              <button
+                className="login-submit"
+                onClick={() => setActivePanel("signin")}
+                type="button"
+              >
+                Continue to sign in
+                <span aria-hidden="true">→</span>
+              </button>
+            </section>
+          )}
+        </div>
+
+        <footer className="login-footer">
+          <span>National Authority for the Protection of Victims of Crime and Witnesses</span>
+          <span>DCFMS prototype · demonstration information only</span>
+        </footer>
       </section>
     </main>
   );

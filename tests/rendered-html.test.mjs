@@ -30,10 +30,12 @@ test("server-renders the DCFMS EPF login prototype", async () => {
   const html = await response.text();
   assert.match(html, /<title>DCFMS Prototype \| NAPVCW<\/title>/i);
   assert.match(html, /Digital Case Flow Management System/);
-  assert.match(html, /Sign in to DCFMS/);
+  assert.match(html, /Employee sign in/);
   assert.match(html, /Username \/ EPF number/);
   assert.match(html, /Demonstration accounts/);
-  assert.match(html, /Production authentication, password hashing and authorization/);
+  assert.match(html, /sri-lanka-government-emblem\.png/);
+  assert.match(html, /napvcw-emblem\.png/);
+  assert.match(html, /Production credentials and role/);
   assert.doesNotMatch(html, /DCFMS-2026-0027/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
