@@ -288,192 +288,58 @@ const viewDivision: Partial<Record<ViewKey, string>> = {
   assistance: "Assistance",
 };
 
-function LegacyLoginPage({
-  onLogin,
-}: {
-  onLogin: (employee: DemoEmployee) => void;
-}) {
-  const [epfNumber, setEpfNumber] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-
-  function submitLogin(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const employee = demoEmployees.find(
-      (record) =>
-        record.epfNumber === epfNumber.trim() && record.password === password,
-    );
-
-    if (!employee) {
-      setError("The EPF number or password is incorrect. Use a demonstration account below.");
-      return;
-    }
-
-    setError("");
-    onLogin(employee);
-  }
-
-  function useDemoAccount(employee: DemoEmployee) {
-    setEpfNumber(employee.epfNumber);
-    setPassword(employee.password);
-    setError("");
-  }
-
+function GovernmentUtilityBar({ inverse = false }: { inverse?: boolean }) {
   return (
-    <main className="login-page">
-      <section className="login-introduction">
-        <div className="login-brand">
-          <div className="login-emblem" aria-hidden="true">
-            NW
-          </div>
-          <div>
-            <p>National Authority</p>
-            <strong>NAPVCW</strong>
-          </div>
-        </div>
+    <div className={`government-strip ${inverse ? "government-strip-inverse" : ""}`}>
+      <div className="government-strip-identity">
+        <span className="service-status-dot" aria-hidden="true" />
+        <strong>Official NAPVCW digital service</strong>
+        <span>Prototype environment</span>
+      </div>
+      <div className="government-strip-links">
+        <span
+          className="language-readiness"
+          role="note"
+          aria-label="Language availability: English interface; Sinhala and Tamil planned"
+          title="Trilingual interface planned"
+        >
+          English <i aria-hidden="true">|</i> සිංහල <i aria-hidden="true">|</i> தமிழ்
+        </span>
+        <a href="https://www.gov.lk/" rel="noreferrer" target="_blank">
+          Government of Sri Lanka
+          <span className="external-mark" aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+  );
+}
 
-        <div className="login-message">
-          <p className="login-kicker">Digital Case Flow Management System</p>
-          <h1>Secure access to coordinated case services.</h1>
-          <p>
-            One protected workspace for complaint registration, legal action,
-            protection services, assistance and executive oversight.
-          </p>
-
-          <div className="login-capabilities">
-            <div>
-              <span>01</span>
-              <p>
-                <strong>Division-based access</strong>
-                Employees are routed directly to their assigned operational division.
-              </p>
-            </div>
-            <div>
-              <span>02</span>
-              <p>
-                <strong>Management oversight</strong>
-                Authorized senior officers can review cross-division statistics.
-              </p>
-            </div>
-            <div>
-              <span>03</span>
-              <p>
-                <strong>Accountability by design</strong>
-                Future production actions will be attributable to an authenticated user.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <p className="login-classification">
-          Prototype environment · demonstration information only
-        </p>
-      </section>
-
-      <section className="login-form-section">
-        <div className="login-form-wrap">
-          <div className="login-form-heading">
-            <span className="secure-badge">Authorized personnel</span>
-            <h2>Sign in to DCFMS</h2>
-            <p>Use your EPF number and assigned password.</p>
-          </div>
-
-          <form className="login-form" onSubmit={submitLogin}>
-            <label>
-              <span>Username / EPF number</span>
-              <div className="login-input">
-                <i aria-hidden="true">ID</i>
-                <input
-                  autoComplete="username"
-                  inputMode="numeric"
-                  name="username"
-                  onChange={(event) => setEpfNumber(event.target.value)}
-                  placeholder="Enter EPF number"
-                  value={epfNumber}
-                />
-              </div>
-            </label>
-
-            <label>
-              <span>Password</span>
-              <div className="login-input">
-                <i aria-hidden="true">••</i>
-                <input
-                  autoComplete="current-password"
-                  name="password"
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Enter password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                />
-                <button
-                  className="password-toggle"
-                  onClick={() => setShowPassword((current) => !current)}
-                  type="button"
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
-              </div>
-            </label>
-
-            <div className="login-options">
-              <label className="remember-option">
-                <input type="checkbox" />
-                <span>Remember EPF number</span>
-              </label>
-              <button className="forgot-button" type="button">
-                Forgot password?
-              </button>
-            </div>
-
-            {error && (
-              <p className="login-error" role="alert">
-                {error}
-              </p>
-            )}
-
-            <button className="login-submit" type="submit">
-              Sign in securely
-              <span aria-hidden="true">→</span>
-            </button>
-          </form>
-
-          <div className="demo-accounts">
-            <div className="demo-heading">
-              <div>
-                <strong>Demonstration accounts</strong>
-                <span>Select an account to fill the login form.</span>
-              </div>
-              <span>Prototype</span>
-            </div>
-            <div className="demo-account-grid">
-              {demoEmployees.map((employee) => (
-                <button
-                  key={employee.epfNumber}
-                  onClick={() => useDemoAccount(employee)}
-                  type="button"
-                >
-                  <span>{employee.initials}</span>
-                  <div>
-                    <strong>{employee.designation}</strong>
-                    <small>
-                      EPF {employee.epfNumber} · {employee.password}
-                    </small>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <p className="login-notice">
-            This screen demonstrates the proposed access flow. Production
-            authentication, password hashing and authorization will be enforced
-            securely on the server.
-          </p>
-        </div>
-      </section>
-    </main>
+function GovernmentFooterLinks() {
+  return (
+    <nav className="government-footer-links" aria-label="Government information">
+      <a href="https://www.gov.lk/" rel="noreferrer" target="_blank">GOV.LK</a>
+      <a
+        href="https://www.gov.lk/sri-lanka/contactus"
+        rel="noreferrer"
+        target="_blank"
+      >
+        Contact
+      </a>
+      <a
+        href="https://www.gov.lk/sri-lanka/faqpage"
+        rel="noreferrer"
+        target="_blank"
+      >
+        FAQ
+      </a>
+      <a
+        href="https://www.gov.lk/sri-lanka/sitemap"
+        rel="noreferrer"
+        target="_blank"
+      >
+        Site map
+      </a>
+    </nav>
   );
 }
 
@@ -614,6 +480,9 @@ function LoginPage({
         sidebarCollapsed ? "login-sidebar-collapsed" : ""
       }`}
     >
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
       <aside className="login-sidebar">
         <div className="login-sidebar-brand">
           <img
@@ -682,6 +551,7 @@ function LoginPage({
       </aside>
 
       <section className="login-stage">
+        <GovernmentUtilityBar inverse={isDark} />
         <header className="login-topbar">
           <div className="login-topbar-identity">
               <img
@@ -707,7 +577,7 @@ function LoginPage({
           </button>
         </header>
 
-        <div className="login-stage-content">
+        <div className="login-stage-content" id="main-content" tabIndex={-1}>
           {activePanel === "signin" && (
             <section className="login-card" aria-labelledby="login-title">
               <div className="login-card-seals" aria-hidden="true">
@@ -1067,8 +937,13 @@ function LoginPage({
         </div>
 
         <footer className="login-footer">
-          <span>National Authority for the Protection of Victims of Crime and Witnesses</span>
-          <span>DCFMS prototype · demonstration information only</span>
+          <div>
+            <strong>
+              National Authority for the Protection of Victims of Crime and Witnesses
+            </strong>
+            <span>DCFMS prototype · demonstration information only</span>
+          </div>
+          <GovernmentFooterLinks />
         </footer>
       </section>
     </main>
@@ -1141,11 +1016,16 @@ export default function Home() {
 
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
       <aside className={`sidebar ${mobileNavOpen ? "sidebar-open" : ""}`}>
         <div className="brand">
-          <div className="brand-mark" aria-hidden="true">
-            NW
-          </div>
+          <img
+            className="brand-mark"
+            src={publicAsset("napvcw-emblem.png")}
+            alt="NAPVCW emblem"
+          />
           <div>
             <p className="brand-kicker">NAPVCW</p>
             <p className="brand-name">Digital Case Flow</p>
@@ -1157,12 +1037,17 @@ export default function Home() {
           Prototype · demonstration data
         </div>
 
-        <nav className="primary-nav" aria-label="Primary navigation">
+        <nav
+          className="primary-nav"
+          id="primary-navigation"
+          aria-label="Primary navigation"
+        >
           <p className="nav-label">
             {sessionUser.scope === "all" ? "Authorized workspaces" : "Assigned workspace"}
           </p>
           {availableViews.map((view) => (
             <button
+              aria-current={activeView === view.key ? "page" : undefined}
               className={`nav-item ${activeView === view.key ? "nav-item-active" : ""}`}
               key={view.key}
               onClick={() => changeView(view.key)}
@@ -1210,8 +1095,11 @@ export default function Home() {
       )}
 
       <main className="main">
+        <GovernmentUtilityBar />
         <header className="topbar">
           <button
+            aria-controls="primary-navigation"
+            aria-expanded={mobileNavOpen}
             className="menu-button"
             type="button"
             aria-label="Open navigation"
@@ -1225,6 +1113,7 @@ export default function Home() {
           <label className="search">
             <span aria-hidden="true">⌕</span>
             <input
+              type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search case ID, division, officer or status"
@@ -1248,7 +1137,14 @@ export default function Home() {
           </div>
         </header>
 
-        <div className="page">
+        <div className="page" id="main-content" tabIndex={-1}>
+          <nav className="service-breadcrumbs" aria-label="Breadcrumb">
+            <span>DCFMS</span>
+            <i aria-hidden="true">/</i>
+            <span>{sessionUser.division}</span>
+            <i aria-hidden="true">/</i>
+            <strong aria-current="page">{activeDefinition.label}</strong>
+          </nav>
           <section className="page-heading">
             <div>
               <p className="eyebrow">{activeDefinition.eyebrow}</p>
@@ -1366,6 +1262,9 @@ export default function Home() {
 
               <div className="table-wrap">
                 <table>
+                  <caption className="sr-only">
+                    Priority case register filtered for {activeDefinition.label}
+                  </caption>
                   <thead>
                     <tr>
                       <th>Case</th>
@@ -1407,6 +1306,9 @@ export default function Home() {
                 {visibleCases.length === 0 && (
                   <div className="empty-state">No demonstration cases match this search.</div>
                 )}
+                <p className="sr-only" aria-live="polite">
+                  {visibleCases.length} demonstration cases match the current search.
+                </p>
               </div>
             </article>
 
@@ -1446,8 +1348,15 @@ export default function Home() {
           </section>
 
           <footer className="page-footer">
-            <span>DCFMS prototype v0.1 · Day 1 visual foundation</span>
-            <span>No real victim, witness or case information is displayed.</span>
+            <div className="page-footer-status">
+              <span>
+                <i className="service-status-dot" aria-hidden="true" />
+                Service available
+              </span>
+              <span>Last reviewed: 31 July 2026</span>
+              <span>No real victim, witness or case information is displayed.</span>
+            </div>
+            <GovernmentFooterLinks />
           </footer>
         </div>
       </main>

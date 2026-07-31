@@ -17,6 +17,18 @@ export async function generateMetadata(): Promise<Metadata> {
     title: "DCFMS Prototype | NAPVCW",
     description:
       "Day 1 demonstration dashboard for the proposed NAPVCW Digital Case Flow Management System.",
+    applicationName: "NAPVCW Digital Case Flow Management System",
+    generator: "NAPVCW DCFMS Prototype",
+    keywords: [
+      "NAPVCW",
+      "Digital Case Flow Management System",
+      "Sri Lanka government",
+      "victim and witness protection",
+    ],
+    robots: {
+      index: false,
+      follow: false,
+    },
     icons: {
       icon: "/favicon.svg",
       shortcut: "/favicon.svg",
@@ -41,7 +53,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en-LK">
       <body>{children}</body>
     </html>
   );
