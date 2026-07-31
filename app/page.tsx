@@ -18,6 +18,10 @@ type ViewKey =
 
 type AccessScope = "division" | "registry" | "all";
 
+function publicAsset(filename: string) {
+  return `${import.meta.env.BASE_URL}${filename.replace(/^\/+/, "")}`;
+}
+
 type DemoEmployee = {
   epfNumber: string;
   password: string;
@@ -539,7 +543,7 @@ function LoginPage({
       <aside className="login-sidebar">
         <div className="login-sidebar-brand">
           <img
-            src="/sri-lanka-government-emblem.png"
+                src={publicAsset("sri-lanka-government-emblem.png")}
             alt="Sri Lanka Government emblem"
           />
           <div className="login-sidebar-title">
@@ -584,7 +588,10 @@ function LoginPage({
         </nav>
 
         <div className="login-sidebar-authority">
-          <img src="/napvcw-emblem.png" alt="NAPVCW emblem" />
+              <img
+                src={publicAsset("napvcw-emblem.png")}
+                alt="NAPVCW emblem"
+              />
           <div>
             <strong>NAPVCW</strong>
             <span>Authorized employee access</span>
@@ -595,7 +602,11 @@ function LoginPage({
       <section className="login-stage">
         <header className="login-topbar">
           <div className="login-topbar-identity">
-            <img src="/napvcw-emblem.png" alt="" aria-hidden="true" />
+              <img
+                src={publicAsset("napvcw-emblem.png")}
+                alt=""
+                aria-hidden="true"
+              />
             <div>
               <p>
                 National Authority for the Protection of Victims of Crime and Witnesses
@@ -619,11 +630,14 @@ function LoginPage({
             <section className="login-card" aria-labelledby="login-title">
               <div className="login-card-seals" aria-hidden="true">
                 <span>
-                  <img src="/sri-lanka-government-emblem.png" alt="" />
+                  <img
+                    src={publicAsset("sri-lanka-government-emblem.png")}
+                    alt=""
+                  />
                 </span>
                 <i />
                 <span>
-                  <img src="/napvcw-emblem.png" alt="" />
+                  <img src={publicAsset("napvcw-emblem.png")} alt="" />
                 </span>
               </div>
 
